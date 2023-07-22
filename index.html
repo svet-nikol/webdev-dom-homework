@@ -84,7 +84,8 @@
     const listLikeButtons = document.querySelectorAll('.like-button');
     
     for (let like of listLikeButtons) {
-      like.addEventListener("click", () => {
+      like.addEventListener("click", (event) => {
+        event.stopPropagation();
         let indexLike = like.dataset.index;
         if (comments[indexLike].isLike) {
           comments[indexLike].likesCounter -= 1;
@@ -106,15 +107,15 @@
   
     // РЕПЛАЙ НА КОММЕНТАРИЙ
 
-      const initEditComment = () => {         // объявление функции ответа на комментарий с цитированием автора и текста
+      const initReplyComment = () => {         // объявление функции ответа на комментарий с цитированием автора и текста
 
-        const listTextComments = document.querySelectorAll('.comment-text');
+        const listLiItems = document.querySelectorAll('.comment');
 
-        for (let TextComment of listTextComments) {
-            TextComment.addEventListener("click", (event) => {
-            let indexText = TextComment.dataset.index;
-            let editComment = `QUOTE_BEGIN ${comments[indexText].nameAuthor}:\n${comments[indexText].commentText} QUOTE_END \n`;
-            textElement.value = editComment;
+        for (let liItem of listLiItems) {
+            liItem.addEventListener("click", () => {
+            let indexLiItem = liItem.dataset.index;
+            let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].nameAuthor}:\n${comments[indexLiItem].commentText} QUOTE_END \n`;
+            textElement.value = replyComment;
 
             renderComments();
 
@@ -134,13 +135,13 @@
 
         const commentsHTML = comments.map((comment, ind) => {
         const Liked = `
-        <li class="comment">
+        <li data-index="${ind}" class="comment">
             <div class="comment-header">
                 <div>${comment.nameAuthor}</div>
                 <div>${comment.timeComment}</div>
             </div>
             <div class="comment-body">
-                <div data-index="${ind}" class="comment-text">
+                <div class="comment-text">
                 ${comment.commentText.replaceAll("QUOTE_BEGIN", "<div class='quote'>").replaceAll("QUOTE_END", "</div>")}
                 </div>
             </div>
@@ -157,10 +158,10 @@
 
         initLikeComments();           // вызов функции добавления/удаления лайка(нажатие на сердечко)
 
-        initEditComment();            // вызов функции ответа на комментарий с цитированием автора и текста
+        initReplyComment();           // вызов функции ответа на комментарий с цитированием автора и текста
 
     }
-    renderComments();                // вызов функции рендеринга
+    renderComments();                 // вызов функции рендеринга
 
 
 
