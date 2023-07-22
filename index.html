@@ -3,7 +3,7 @@
   <head>
     <title>Проект "Комменты"</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles_2.11.css" />
   </head>
 
   <body>
@@ -38,15 +38,18 @@
     </div>
   </body>
 
+
+
+
   <script>
     "use strict";
+
 
   const ulElement = document.querySelector('ul[class="comments"]');
   const buttonElement = document.querySelector('button[class="add-form-button"]');
   const nameElement = document.querySelector('input[class="add-form-name"]');
   const textElement = document.querySelector('textarea[class="add-form-text"]');
-  const currentTime = new Date();
-  const commentTime = `${currentTime.toLocaleDateString('ru-Ru', { day: "2-digit", month: "2-digit", year: "2-digit" })} ${currentTime.toLocaleTimeString('ru-Ru', { hour: "2-digit", minute: "2-digit" })}`;
+
 
 
 
@@ -71,6 +74,10 @@
     },
   ];
 
+
+
+
+
   // ЛАЙК КОММЕНТАРИЯ                  
 
   const initLikeComments = () => {       // объявление функции добавления/удаления лайка(нажатие на сердечко)
@@ -86,10 +93,7 @@
           comments[indexLike].likesCounter += 1;
           comments[indexLike].isLike = true;
         }
-        // console.log(indexLike);
-        // console.log(comments[indexLike]);
 
-        // comments[indexLike].isLike = !comments[indexLike].isLike;
         renderComments();
 
       })
@@ -97,39 +101,69 @@
   };
 
 
+
+
   
+    // РЕПЛАЙ НА КОММЕНТАРИЙ
 
-  // РЕНДЕРИНГ СТРАНИЦЫ
+      const initEditComment = () => {         // объявление функции ответа на комментарий с цитированием автора и текста
 
-  const renderComments = () => {         // объявление функции рендеринга
+        const listTextComments = document.querySelectorAll('.comment-text');
 
-    const commentsHTML = comments.map((comment, ind) => {
-      const Liked = `
-      <li class="comment">
-          <div class="comment-header">
-            <div>${comment.nameAuthor}</div>
-            <div>${comment.timeComment}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${comment.commentText}
+        for (let TextComment of listTextComments) {
+            TextComment.addEventListener("click", (event) => {
+            let indexText = TextComment.dataset.index;
+            let editComment = `QUOTE_BEGIN ${comments[indexText].nameAuthor}:\n${comments[indexText].commentText} QUOTE_END \n`;
+            textElement.value = editComment;
+
+            renderComments();
+
+          })
+        }
+      }
+
+
+
+
+
+
+
+    // РЕНДЕРИНГ СТРАНИЦЫ
+
+    const renderComments = () => {         // объявление функции рендеринга
+
+        const commentsHTML = comments.map((comment, ind) => {
+        const Liked = `
+        <li class="comment">
+            <div class="comment-header">
+                <div>${comment.nameAuthor}</div>
+                <div>${comment.timeComment}</div>
             </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">${comment.likesCounter}</span>
-              <button data-index="${ind}" class="like-button ${comment.isLike ? "-active-like": ""}"></button>
+            <div class="comment-body">
+                <div data-index="${ind}" class="comment-text">
+                ${comment.commentText.replaceAll("QUOTE_BEGIN", "<div class='quote'>").replaceAll("QUOTE_END", "</div>")}
+                </div>
             </div>
-          </div>
-        </li> `;
-      return Liked;
-    }).join("")
-    ulElement.innerHTML = commentsHTML;
+            <div class="comment-footer">
+                <div class="likes">
+                <span class="likes-counter">${comment.likesCounter}</span>
+                <button data-index="${ind}" class="like-button ${comment.isLike ? "-active-like": ""}"></button>
+                </div>
+            </div>
+            </li> `;
+        return Liked;
+        }).join("")
+        ulElement.innerHTML = commentsHTML;
 
-    initLikeComments();
+        initLikeComments();           // вызов функции добавления/удаления лайка(нажатие на сердечко)
 
-  }
-  renderComments();                // вызов функции рендеринга
+        initEditComment();            // вызов функции ответа на комментарий с цитированием автора и текста
+
+    }
+    renderComments();                // вызов функции рендеринга
+
+
+
 
 
 
@@ -170,15 +204,26 @@
 
   function handleButtons() {          // объявление функции добавления комментария
 
+    let currentTime = new Date();
+    let commentTime = `${currentTime.toLocaleDateString('ru-Ru', { day: "2-digit", month: "2-digit", year: "2-digit" })} ${currentTime.toLocaleTimeString('ru-Ru', { hour: "2-digit", minute: "2-digit" })}`;
+
     if (buttonCheck || enterCheck) {  // клик либо на кнопку "Написать", либо на "Enter" произошел
       if (nameElement.value === '' || textElement.value === '') { // если имя или текст незаполнены, но кнопка "Написать" или "Enter" нажата,
         buttonElement.className = 'error-add-form-button';        // то элемент не добавлять и кнопку "Написать" покрасить в серый цвет
         return;
       }
       comments.push({                   // добавление коммента на страницу путем включения объекта в массив
-        nameAuthor: nameElement.value,
+        nameAuthor: nameElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
         timeComment: commentTime,
-        commentText: textElement.value,
+        commentText: textElement.value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;"),
         likesCounter: 0,
         isLike: false,
         isEdit: false,
@@ -205,6 +250,10 @@
       handleButtons();                   
     }
   });
+
+
+
+
 
 
 
