@@ -134,7 +134,7 @@
     const renderComments = () => {         // объявление функции рендеринга
 
         const commentsHTML = comments.map((comment, ind) => {
-        const Liked = `
+        const liked = `
         <li data-index="${ind}" class="comment">
             <div class="comment-header">
                 <div>${comment.nameAuthor}</div>
@@ -152,7 +152,7 @@
                 </div>
             </div>
             </li> `;
-        return Liked;
+        return liked;
         }).join("")
         ulElement.innerHTML = commentsHTML;
 
