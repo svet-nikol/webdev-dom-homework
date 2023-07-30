@@ -163,7 +163,7 @@
     initReplyComment();           // вызов функции ответа на комментарий с цитированием автора и текста
 
   }
-  renderComments();                 // вызов функции рендеринга
+  // renderComments();                 // вызов функции рендеринга
 
 
 
@@ -236,7 +236,7 @@
 
       // FETCH POST - добавление коммента на страницу через отправку по API на сервер
 
-      fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST
+      fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST - отправляем коммент на сервер
         {
           method: "POST",
           body: JSON.stringify({
@@ -249,11 +249,10 @@
         }).then((response) => {
           response.json().then((responseData) => {
             comments = responseData.comments;
-            renderComments();
           });
         });
       
-        fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
+        fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получаем комменты с сервера и рендерим их
         {
           method: "GET",
         }).then((response) => {
@@ -263,7 +262,6 @@
           });
         });
 
-      renderComments();                 // перерисовываем страницу с учетом нового объекта в массиве
 
       nameElement.value = '';           // возвращаем начальные значения полям формы ввода
       textElement.value = '';
@@ -284,10 +282,6 @@
       handleButtons();
     }
   });
-
-
-
-
 
 
 
