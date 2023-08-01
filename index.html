@@ -1,48 +1,40 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Проект "Комменты"</title>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
 
-  <body>
-    <div class="container">
-      <ul class="comments">
+<head>
+  <title>Проект "Комменты"</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-         <!-- рендерится из JS -->
+<body>
+  <div class="container">
+    <ul class="comments">
 
-      </ul>
+      <!-- рендерится из JS -->
 
-      <div class="delete-form">
-        <button class="delete-form-button">Удалить последний комментарий</button>
-      </div>
+    </ul>
+
+    <div class="delete-form">
+      <button class="delete-form-button">Удалить последний комментарий</button>
+    </div>
 
 
-      <div class="add-form">
-        <input
-          type="text"
-          class="add-form-name"
-          placeholder="Введите ваше имя"
-        />
-        <textarea
-          type="textarea"
-          class="add-form-text"
-          placeholder="Введите ваш коментарий"
-          rows="4"
-        ></textarea>
-        <div class="add-form-row">
-          <button class="add-form-button">Написать</button>
-        </div>
+    <div class="add-form">
+      <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
+      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
+      <div class="add-form-row">
+        <button class="add-form-button">Написать</button>
       </div>
     </div>
-  </body>
+  </div>
+</body>
 
 
 
 
-  <script>
-    "use strict";
+<script>
+  "use strict";
 
 
   const ulElement = document.querySelector('ul[class="comments"]');
@@ -55,26 +47,39 @@
 
   // СТРУКТУРА ХРАНЕНИЯ ДАННЫХ - МАССИВ ОБЪЕКТОВ
 
-  const comments = [
-    {
-      nameAuthor: "Глеб Фокин",
-      timeComment: "12.02.22 12:18",
-      commentText: "Это будет первый комментарий на этой странице",
-      likesCounter: 3,
-      isLike: false,
-      isEdit: false,
-    },
-    {
-      nameAuthor: "Варвара Н.",
-      timeComment: "13.02.22 19:22",
-      commentText: "Мне нравится как оформлена эта страница! ❤",
-      likesCounter: 75,
-      isLike: true,
-      isEdit: false,
-    },
+  let comments = [
+    // {
+    //   nameAuthor: "Глеб Фокин",
+    //   timeComment: "12.02.22 12:18",
+    //   commentText: "Это будет первый комментарий на этой странице",
+    //   likesCounter: 3,
+    //   isLike: false,
+    //   isEdit: false,
+    // },
+    // {
+    //   nameAuthor: "Варвара Н.",
+    //   timeComment: "13.02.22 19:22",
+    //   commentText: "Мне нравится как оформлена эта страница! ❤",
+    //   likesCounter: 75,
+    //   isLike: true,
+    //   isEdit: false,
+    // },
   ];
 
 
+
+
+  // FETCH GET - получение комментов с сервера
+
+  fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
+        {
+          method: "GET",
+        }).then((response) => {
+          response.json().then((responseData) => {
+            comments = responseData.comments;
+            renderComments();
+          });
+        });
 
 
 
@@ -82,17 +87,17 @@
 
   const initLikeComments = () => {       // объявление функции добавления/удаления лайка(нажатие на сердечко)
     const listLikeButtons = document.querySelectorAll('.like-button');
-    
+
     for (let like of listLikeButtons) {
       like.addEventListener("click", (event) => {
         event.stopPropagation();
         let indexLike = like.dataset.index;
-        if (comments[indexLike].isLike) {
-          comments[indexLike].likesCounter -= 1;
-          comments[indexLike].isLike = false;
+        if (comments[indexLike].isLiked) {
+          comments[indexLike].likes -= 1;
+          comments[indexLike].isLiked = false;
         } else {
-          comments[indexLike].likesCounter += 1;
-          comments[indexLike].isLike = true;
+          comments[indexLike].likes += 1;
+          comments[indexLike].isLiked = true;
         }
 
         renderComments();
@@ -104,65 +109,64 @@
 
 
 
-  
-    // РЕПЛАЙ НА КОММЕНТАРИЙ
 
-      const initReplyComment = () => {         // объявление функции ответа на комментарий с цитированием автора и текста
+  // РЕПЛАЙ НА КОММЕНТАРИЙ
 
-        const listLiItems = document.querySelectorAll('.comment');
+  const initReplyComment = () => {         // объявление функции ответа на комментарий с цитированием автора и текста
 
-        for (let liItem of listLiItems) {
-            liItem.addEventListener("click", () => {
-            let indexLiItem = liItem.dataset.index;
-            let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].nameAuthor}:\n${comments[indexLiItem].commentText} QUOTE_END \n`;
-            textElement.value = replyComment;
+    const listLiItems = document.querySelectorAll('.comment');
 
-            renderComments();
+    for (let liItem of listLiItems) {
+      liItem.addEventListener("click", () => {
+        let indexLiItem = liItem.dataset.index;
+        let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].author.name}:\n${comments[indexLiItem].text} QUOTE_END \n`;
+        textElement.value = replyComment;
 
-          })
-        }
-      }
+        renderComments();
 
-
+      })
+    }
+  }
 
 
 
 
 
-    // РЕНДЕРИНГ СТРАНИЦЫ
+  // РЕНДЕРИНГ СТРАНИЦЫ
 
-    const renderComments = () => {         // объявление функции рендеринга
+  const renderComments = () => {         // объявление функции рендеринга
 
-        const commentsHTML = comments.map((comment, ind) => {
-        const liked = `
+    const commentsHTML = comments.map((comment, ind) => {
+
+      let currentTime = new Date(comment.date);
+      let commentTime = `${currentTime.toLocaleDateString('ru-Ru', { day: "2-digit", month: "2-digit", year: "2-digit" })} ${currentTime.toLocaleTimeString('ru-Ru', { hour: "2-digit", minute: "2-digit" })}`;
+
+      return `
         <li data-index="${ind}" class="comment">
             <div class="comment-header">
-                <div>${comment.nameAuthor}</div>
-                <div>${comment.timeComment}</div>
+                <div>${comment.author.name}</div>
+                <div>${commentTime}</div>
             </div>
             <div class="comment-body">
                 <div class="comment-text">
-                ${comment.commentText.replaceAll("QUOTE_BEGIN", "<div class='quote'>").replaceAll("QUOTE_END", "</div>")}
+                ${comment.text.replaceAll("QUOTE_BEGIN", "<div class='quote'>").replaceAll("QUOTE_END", "</div>")}
                 </div>
             </div>
             <div class="comment-footer">
                 <div class="likes">
-                <span class="likes-counter">${comment.likesCounter}</span>
-                <button data-index="${ind}" class="like-button ${comment.isLike ? "-active-like": ""}"></button>
+                <span class="likes-counter">${comment.likes}</span>
+                <button data-index="${ind}" class="like-button ${comment.isLiked ? "-active-like" : ""}"></button>
                 </div>
             </div>
-            </li> `;
-        return liked;
-        }).join("")
-        ulElement.innerHTML = commentsHTML;
+        </li> `;
+    }).join("");
+    ulElement.innerHTML = commentsHTML;
 
-        initLikeComments();           // вызов функции добавления/удаления лайка(нажатие на сердечко)
+    initLikeComments();           // вызов функции добавления/удаления лайка(нажатие на сердечко)
 
-        initReplyComment();           // вызов функции ответа на комментарий с цитированием автора и текста
+    initReplyComment();           // вызов функции ответа на комментарий с цитированием автора и текста
 
-    }
-    renderComments();                 // вызов функции рендеринга
-
+  }
 
 
 
@@ -205,56 +209,91 @@
 
   function handleButtons() {          // объявление функции добавления комментария
 
-    let currentTime = new Date();
-    let commentTime = `${currentTime.toLocaleDateString('ru-Ru', { day: "2-digit", month: "2-digit", year: "2-digit" })} ${currentTime.toLocaleTimeString('ru-Ru', { hour: "2-digit", minute: "2-digit" })}`;
+
 
     if (buttonCheck || enterCheck) {  // клик либо на кнопку "Написать", либо на "Enter" произошел
       if (nameElement.value === '' || textElement.value === '') { // если имя или текст незаполнены, но кнопка "Написать" или "Enter" нажата,
         buttonElement.className = 'error-add-form-button';        // то элемент не добавлять и кнопку "Написать" покрасить в серый цвет
         return;
       }
-      comments.push({                   // добавление коммента на страницу путем включения объекта в массив
-        nameAuthor: nameElement.value
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;"),
-        timeComment: commentTime,
-        commentText: textElement.value
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;"),
-        likesCounter: 0,
-        isLike: false,
-        isEdit: false,
-      });
+
+
+      // comments.push({                   // добавление коммента на страницу путем включения объекта в массив
+      //   // nameAuthor: nameElement.value
+      //   //   .replaceAll("&", "&amp;")
+      //   //   .replaceAll("<", "&lt;")
+      //   //   .replaceAll(">", "&gt;")
+      //   //   .replaceAll('"', "&quot;"),
+      //   timeComment: commentTime,
+      //   // commentText: textElement.value
+      //   //   .replaceAll("&", "&amp;")
+      //   //   .replaceAll("<", "&lt;")
+      //   //   .replaceAll(">", "&gt;")
+      //   //   .replaceAll('"', "&quot;"),
+      //   likesCounter: 0,
+      //   isLike: false,
+      //   isEdit: false,
+      // });
+
+
       
-      renderComments();                 // перерисовываем страницу с учетом нового объекта в массиве
+
+
+      // FETCH POST - добавление коммента на страницу через отправку по API на сервер
+
+      fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST - отправляем коммент на сервер
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name: nameElement.value
+                  .replaceAll("&", "&amp;")
+                  .replaceAll("<", "&lt;")
+                  .replaceAll(">", "&gt;")
+                  .replaceAll('"', "&quot;"),
+            text: textElement.value
+                  .replaceAll("&", "&amp;")
+                  .replaceAll("<", "&lt;")
+                  .replaceAll(">", "&gt;")
+                  .replaceAll('"', "&quot;"),
+            isLiked:	false,
+            likes: 0,
+          }),
+        }).then((response) => {
+          response.json().then((responseData) => {
+            comments = responseData.comments;
+          });
+        });
       
+        fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получаем комменты с сервера и рендерим их
+        {
+          method: "GET",
+        }).then((response) => {
+          response.json().then((responseData) => {
+            comments = responseData.comments;
+            renderComments();
+          });
+        });
+
+
       nameElement.value = '';           // возвращаем начальные значения полям формы ввода
       textElement.value = '';
       buttonElement.className = 'error-add-form-button';
       nameElementCheck = false;
       textElementCheck = false;
-    }
-  }
+    };
+  };
 
   buttonElement.addEventListener("click", () => {   // вызов функции добавления комментария по клику на кнопку "Написать"
     buttonCheck = true;
-    handleButtons();                     
+    handleButtons();
   });
 
   document.addEventListener("keyup", (event) => {   // вызов функции добавления комментария по клику на кнопку "Enter"
     if (event.key === 'Enter') {
       enterCheck = true;
-      handleButtons();                   
+      handleButtons();
     }
   });
-
-
-
-
 
 
 
@@ -266,10 +305,11 @@
     let lis = document.querySelectorAll('.comment');  // создаем коллекцию/псевдомассив из элементов с классом '.comment'
     let liDelete = lis[lis.length - 1];  // определяем элемент для удаления по индексу последнего в коллекции
     liDelete.parentNode.removeChild(liDelete); // вызываем метод удаления потомка коллекции - элемента для удаления
-    });
+  });
 
 
 
 
-  </script>
+</script>
+
 </html>
