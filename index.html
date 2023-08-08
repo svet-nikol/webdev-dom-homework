@@ -15,6 +15,11 @@
 
     </ul>
 
+    <div class="comments-progress">
+      <p>Подождите, комментарии загружаются...</p>   <!-- для лоудера на момент загрузки всех комментариев с свервера -->
+    </div>
+
+
     <div class="delete-form">
       <button class="delete-form-button">Удалить последний комментарий</button>
     </div>
@@ -27,6 +32,9 @@
         <button class="add-form-button">Написать</button>
       </div>
     </div>
+    <div class="add-form-progress">    <!-- для лоудера на момент добавления нового коммента -->
+      <p>Ваш комментарий добавляется...</p>
+    </div>
   </div>
 </body>
 
@@ -38,48 +46,47 @@
 
 
   const ulElement = document.querySelector('ul[class="comments"]');
+  const ulProgressElement = document.querySelector('div[class="comments-progress"]');
   const buttonElement = document.querySelector('button[class="add-form-button"]');
   const nameElement = document.querySelector('input[class="add-form-name"]');
   const textElement = document.querySelector('textarea[class="add-form-text"]');
+  const addFormElement = document.querySelector('div[class="add-form"]');
+  const addFormProgressElement = document.querySelector('div[class="add-form-progress"]');
 
 
 
 
   // СТРУКТУРА ХРАНЕНИЯ ДАННЫХ - МАССИВ ОБЪЕКТОВ
 
-  let comments = [
-    // {
-    //   nameAuthor: "Глеб Фокин",
-    //   timeComment: "12.02.22 12:18",
-    //   commentText: "Это будет первый комментарий на этой странице",
-    //   likesCounter: 3,
-    //   isLike: false,
-    //   isEdit: false,
-    // },
-    // {
-    //   nameAuthor: "Варвара Н.",
-    //   timeComment: "13.02.22 19:22",
-    //   commentText: "Мне нравится как оформлена эта страница! ❤",
-    //   likesCounter: 75,
-    //   isLike: true,
-    //   isEdit: false,
-    // },
-  ];
-
+  let comments = [];       // объекты получаем с сервера по API в функции fetchAndRenderComments 
 
 
 
   // FETCH GET - получение комментов с сервера
 
-  fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
+  const fetchAndRenderComments = () => {
+    return fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
         {
           method: "GET",
         }).then((response) => {
-          response.json().then((responseData) => {
-            comments = responseData.comments;
-            renderComments();
-          });
+          return response.json();
+        }).then((responseData) => {
+          comments = responseData.comments;
+          renderComments();
         });
+    };
+
+
+  const initGetComments = () => {          // подождите, комментарии загружаются при первой загрузке страницы
+    ulElement.style.display = 'none';
+    ulProgressElement.style.display = 'block';
+    fetchAndRenderComments()
+    .then((data) => {
+      ulElement.style.display = 'flex';
+      ulProgressElement.style.display = 'none';
+    }); 
+  }
+  initGetComments();
 
 
 
@@ -109,7 +116,6 @@
 
 
 
-
   // РЕПЛАЙ НА КОММЕНТАРИЙ
 
   const initReplyComment = () => {         // объявление функции ответа на комментарий с цитированием автора и текста
@@ -127,7 +133,6 @@
       })
     }
   }
-
 
 
 
@@ -166,8 +171,7 @@
 
     initReplyComment();           // вызов функции ответа на комментарий с цитированием автора и текста
 
-  }
-
+  };
 
 
 
@@ -201,14 +205,12 @@
 
 
 
-
   // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАРИЙ ЧЕРЕЗ ФОРМУ ВВОДА
 
   let buttonCheck = false;  // для проверки событий нажата либо кнопка "Написать",
   let enterCheck = false;   // либо кнопка "Enter" ввожу переменные, со значением по умолчанию
 
-  function handleButtons() {          // объявление функции добавления комментария
-
+  function handleAddButtons() {          // объявление функции добавления комментария
 
 
     if (buttonCheck || enterCheck) {  // клик либо на кнопку "Написать", либо на "Enter" произошел
@@ -218,25 +220,8 @@
       }
 
 
-      // comments.push({                   // добавление коммента на страницу путем включения объекта в массив
-      //   // nameAuthor: nameElement.value
-      //   //   .replaceAll("&", "&amp;")
-      //   //   .replaceAll("<", "&lt;")
-      //   //   .replaceAll(">", "&gt;")
-      //   //   .replaceAll('"', "&quot;"),
-      //   timeComment: commentTime,
-      //   // commentText: textElement.value
-      //   //   .replaceAll("&", "&amp;")
-      //   //   .replaceAll("<", "&lt;")
-      //   //   .replaceAll(">", "&gt;")
-      //   //   .replaceAll('"', "&quot;"),
-      //   likesCounter: 0,
-      //   isLike: false,
-      //   isEdit: false,
-      // });
-
-
-      
+      addFormElement.style.display = 'none';
+      addFormProgressElement.style.display = 'block'
 
 
       // FETCH POST - добавление коммента на страницу через отправку по API на сервер
@@ -259,19 +244,14 @@
             likes: 0,
           }),
         }).then((response) => {
-          response.json().then((responseData) => {
-            comments = responseData.comments;
-          });
-        });
-      
-        fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получаем комменты с сервера и рендерим их
-        {
-          method: "GET",
-        }).then((response) => {
-          response.json().then((responseData) => {
-            comments = responseData.comments;
-            renderComments();
-          });
+          return response.json();
+        }).then((responseData) => {
+          comments = responseData.comments;
+        }).then(() => {
+          return fetchAndRenderComments();                          // FETCH GET - получение комментов с сервера и их рендеринг
+        }).then((data) => {
+          addFormProgressElement.style.display = 'none';
+          addFormElement.style.display = 'flex';
         });
 
 
@@ -285,13 +265,13 @@
 
   buttonElement.addEventListener("click", () => {   // вызов функции добавления комментария по клику на кнопку "Написать"
     buttonCheck = true;
-    handleButtons();
+    handleAddButtons();
   });
 
   document.addEventListener("keyup", (event) => {   // вызов функции добавления комментария по клику на кнопку "Enter"
     if (event.key === 'Enter') {
       enterCheck = true;
-      handleButtons();
+      handleAddButtons();
     }
   });
 
