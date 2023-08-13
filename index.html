@@ -84,6 +84,12 @@
     .then((data) => {
       ulElement.style.display = 'flex';
       ulProgressElement.style.display = 'none';
+    })
+    .catch((error) => {
+      ulElement.style.display = 'flex';
+      ulProgressElement.style.display = 'none';
+      alert("Кажется у тебя упал интернет, попробуй позже обновить страницу...");
+      console.warn(error);
     }); 
   }
   initGetComments();
@@ -225,7 +231,7 @@
 
 
       // FETCH POST - добавление коммента на страницу через отправку по API на сервер
-
+      
       fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST - отправляем коммент на сервер
         {
           method: "POST",
@@ -242,8 +248,15 @@
                   .replaceAll('"', "&quot;"),
             isLiked:	false,
             likes: 0,
+            forceError: true,
           }),
         }).then((response) => {
+          if (response.status === 500) {
+            throw new Error("Сервер сломался");
+          }
+          if (response.status === 400) {
+            throw new Error("Плохой запрос");
+          }
           return response.json();
         }).then((responseData) => {
           comments = responseData.comments;
@@ -252,14 +265,25 @@
         }).then((data) => {
           addFormProgressElement.style.display = 'none';
           addFormElement.style.display = 'flex';
+
+          nameElement.value = '';           // возвращаем начальные значения полям формы ввода
+          textElement.value = '';
+          buttonElement.className = 'error-add-form-button';
+          nameElementCheck = false;
+          textElementCheck = false;
+        }).catch((error) => {
+          addFormProgressElement.style.display = 'none';
+          addFormElement.style.display = 'flex';
+          if (error.message === "Плохой запрос") {
+            alert("Имя и комментарий должны быть не короче 3 символов");
+            return;
+          }
+          alert("Кажется, у вас сломался интернет, попробуйте позже");
+          console.warn(error);
         });
 
 
-      nameElement.value = '';           // возвращаем начальные значения полям формы ввода
-      textElement.value = '';
-      buttonElement.className = 'error-add-form-button';
-      nameElementCheck = false;
-      textElementCheck = false;
+
     };
   };
 
