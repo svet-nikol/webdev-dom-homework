@@ -258,12 +258,6 @@
           if (response.status === 400) {
             throw new Error("Плохой запрос");
           }
-          // if (response === "") {
-          //   throw new Error("offline");
-          // }
-          // if (() {
-          //   TypeError("offline")
-          // })
           return response.json();
         }).then((responseData) => {
           comments = responseData.comments;
@@ -288,23 +282,14 @@
           if (error.message === "Сервер сломался") {
             postComment();
           }
-          // if (error.message === "offline") {
-          //   alert("Кажется, у вас сломался интернет, попробуйте позже");
-          //   return;
-          // }
-          // if (error.message !== "Плохой запрос" && error.message !=="Сервер сломался" ) {
-          // alert("Кажется, у вас сломался интернет, попробуйте позже");
-          // return;  
-          // }
-          // if (typeError === "offline") {
-          // alert("Кажется, у вас сломался интернет, попробуйте позже");
-          // return;  
-          // }
+          else {
+            alert("Кажется, у вас сломался интернет, попробуйте позже");
+          }
           console.warn(error);
         });
       }
 
-      postComment();
+    postComment();
 
     };
   };
@@ -312,6 +297,7 @@
   buttonElement.addEventListener("click", () => {   // вызов функции добавления комментария по клику на кнопку "Написать"
     buttonCheck = true;
     handleAddButtons();
+
   });
 
   document.addEventListener("keyup", (event) => {   // вызов функции добавления комментария по клику на кнопку "Enter"
