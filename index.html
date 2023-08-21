@@ -84,6 +84,12 @@
     .then((data) => {
       ulElement.style.display = 'flex';
       ulProgressElement.style.display = 'none';
+    })
+    .catch((error) => {
+      ulElement.style.display = 'flex';
+      ulProgressElement.style.display = 'none';
+      alert("Кажется, у вас сломался интернет, попробуйте позже обновить страницу...");
+      console.warn(error);
     }); 
   }
   initGetComments();
@@ -225,8 +231,9 @@
 
 
       // FETCH POST - добавление коммента на страницу через отправку по API на сервер
-
-      fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST - отправляем коммент на сервер
+      
+      function postComment() {
+        fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST - отправляем коммент на сервер
         {
           method: "POST",
           body: JSON.stringify({
@@ -242,8 +249,15 @@
                   .replaceAll('"', "&quot;"),
             isLiked:	false,
             likes: 0,
+            forceError: true,
           }),
         }).then((response) => {
+          if (response.status === 500) {
+            throw new Error("Сервер сломался");
+          }
+          if (response.status === 400) {
+            throw new Error("Плохой запрос");
+          }
           return response.json();
         }).then((responseData) => {
           comments = responseData.comments;
@@ -252,20 +266,38 @@
         }).then((data) => {
           addFormProgressElement.style.display = 'none';
           addFormElement.style.display = 'flex';
+
+          nameElement.value = '';           // возвращаем начальные значения полям формы ввода
+          textElement.value = '';
+          buttonElement.className = 'error-add-form-button';
+          nameElementCheck = false;
+          textElementCheck = false;
+        }).catch((error, typeError) => {
+          addFormProgressElement.style.display = 'none';
+          addFormElement.style.display = 'flex';
+          if (error.message === "Плохой запрос") {
+            alert("Имя и комментарий должны быть не короче 3 символов");
+            return;
+          }
+          if (error.message === "Сервер сломался") {
+            postComment();
+          }
+          else {
+            alert("Кажется, у вас сломался интернет, попробуйте позже");
+          }
+          console.warn(error);
         });
+      }
 
+    postComment();
 
-      nameElement.value = '';           // возвращаем начальные значения полям формы ввода
-      textElement.value = '';
-      buttonElement.className = 'error-add-form-button';
-      nameElementCheck = false;
-      textElementCheck = false;
     };
   };
 
   buttonElement.addEventListener("click", () => {   // вызов функции добавления комментария по клику на кнопку "Написать"
     buttonCheck = true;
     handleAddButtons();
+
   });
 
   document.addEventListener("keyup", (event) => {   // вызов функции добавления комментария по клику на кнопку "Enter"
