@@ -3,98 +3,45 @@ const indexContainerElement = document.querySelector('div[class="container"]');
 const ulElement = document.querySelector('ul[class="comments"]');
 const ulProgressElement = document.querySelector('div[class="comments-progress"]');
 const addFormProgressElement = document.querySelector('div[class="add-form-progress"]');
-
-
-
+const containerFormsElement = document.querySelector('div[class="containerForms"]');
 
 // СТРУКТУРА ХРАНЕНИЯ ДАННЫХ - МАССИВ ОБЪЕКТОВ
 
 let comments = [];       // объекты получаем с сервера по API в функции fetchAndRenderComments 
 
-
-
-// FETCH GET - получение комментов с сервера
-
-const fetchAndRenderComments = () => {
-  return fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
-      {
-        method: "GET",
-      }).then((response) => {
-        return response.json();
-      }).then((responseData) => {
-        comments = responseData.comments;
-        renderComments();
-      });
-  };
-
-
-const initGetComments = () => {          // подождите, комментарии загружаются при первой загрузке страницы
-  ulElement.style.display = 'none';
-  ulProgressElement.style.display = 'block';
-  fetchAndRenderComments()
-  .then((data) => {
-    ulElement.style.display = 'flex';
-    ulProgressElement.style.display = 'none';
-  })
-  .catch((error) => {
-    ulElement.style.display = 'flex';
-    ulProgressElement.style.display = 'none';
-    alert("Кажется, у вас сломался интернет, попробуйте позже обновить страницу...");
-    console.warn(error);
-  }); 
-}
-initGetComments();
-
-
-
-// ЛАЙК КОММЕНТАРИЯ                  
-
-const initLikeComments = () => {       // объявление функции добавления/удаления лайка(нажатие на сердечко)
-  const listLikeButtons = document.querySelectorAll('.like-button');
-
-  for (let like of listLikeButtons) {
-    like.addEventListener("click", (event) => {
-      event.stopPropagation();
-      let indexLike = like.dataset.index;
-      if (comments[indexLike].isLiked) {
-        comments[indexLike].likes -= 1;
-        comments[indexLike].isLiked = false;
-      } else {
-        comments[indexLike].likes += 1;
-        comments[indexLike].isLiked = true;
-      }
-
+function fetchAndRenderComments() {
+    return fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
+    {
+      method: "GET",
+    }).then((response) => {
+      return response.json();
+    }).then((responseData) => {
+      comments = responseData.comments;
       renderComments();
+    });
+}
 
+function initGetComments() {          // подождите, комментарии загружаются при первой загрузке страницы
+    ulElement.style.display = 'none';
+    ulProgressElement.style.display = 'block';
+    fetchAndRenderComments()
+    .then((data) => {
+      ulElement.style.display = 'flex';
+      ulProgressElement.style.display = 'none';
     })
-  }
-};
+    .catch((error) => {
+      ulElement.style.display = 'flex';
+      ulProgressElement.style.display = 'none';
+      alert("Кажется, у вас сломался интернет, попробуйте позже обновить страницу...");
+      console.warn(error);
+    }); 
+}
 
-
-        // РЕПЛАЙ НА КОММЕНТАРИЙ
-
-  function initReplyComment() {         // объявление функции ответа на комментарий с цитированием автора и текста
-
-  const listLiItems = document.querySelectorAll('.comment');
-  const textElement = document.querySelector('textarea[class="add-form-text"]');
-
-    for (let liItem of listLiItems) {
-        liItem.addEventListener("click", () => {
-        let indexLiItem = liItem.dataset.index;
-        let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].author.name}:\n${comments[indexLiItem].text} QUOTE_END \n`;
-        textElement.value = replyComment;
-
-        // renderComments();
-
-        })
-    }
-  }
-
-  // initReplyComment();  
+initGetComments();
 
 // РЕНДЕРИНГ СТРАНИЦЫ
 
-const renderComments = () => {         // объявление функции рендеринга
+function renderComments() {      // объявление функции рендеринга комментариев
 
   const commentsHTML = comments.map((comment, ind) => {
 
@@ -120,9 +67,55 @@ const renderComments = () => {         // объявление функции р
           </div>
       </li> `;
   }).join("");
-  // ulElement.innerHTML = commentsHTML;
-  indexContainerElement.innerHTML = `<ul class="comments">${commentsHTML}</ul>
-  <div class="delete-form">
+
+  ulElement.innerHTML = commentsHTML;
+
+  initLikeComments(); 
+  initReplyComment();
+
+}
+
+function initLikeComments() {       // объявление функции добавления/удаления лайка(нажатие на сердечко)
+    
+    const listLikeButtons = document.querySelectorAll('.like-button');
+  
+    for (let like of listLikeButtons) {
+      like.addEventListener("click", (event) => {
+        event.stopPropagation();
+        let indexLike = like.dataset.index;
+        if (comments[indexLike].isLiked) {
+          comments[indexLike].likes -= 1;
+          comments[indexLike].isLiked = false;
+        } else {
+          comments[indexLike].likes += 1;
+          comments[indexLike].isLiked = true;
+        }
+  
+        renderComments();
+  
+      })
+    }
+}
+
+    // РЕПЛАЙ НА КОММЕНТАРИЙ
+
+function initReplyComment() {         // объявление функции ответа на комментарий с цитированием автора и текста
+
+   const listLiItems = document.querySelectorAll('.comment');
+   const textElement = document.querySelector('textarea[class="add-form-text"]');
+ 
+        for (let liItem of listLiItems) {
+            liItem.addEventListener("click", () => {
+                let indexLiItem = liItem.dataset.index;
+                let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].author.name}:\n${comments[indexLiItem].text} QUOTE_END \n`;
+                textElement.value = replyComment;
+                renderComments();
+            })
+        }
+}
+
+function renderForms() {
+    containerFormsElement.innerHTML = `  <div class="delete-form">
     <button class="delete-form-button">Удалить последний комментарий</button>
   </div>
   <div class="add-form">
@@ -133,71 +126,54 @@ const renderComments = () => {         // объявление функции р
     </div>
   </div>`;
 
-  const buttonElement = document.querySelector('button[class="add-form-button"]');
-  const nameElement = document.querySelector('input[class="add-form-name"]');
-  const textElement = document.querySelector('textarea[class="add-form-text"]');
-  const addFormElement = document.querySelector('div[class="add-form"]');
-  
-//   const listLiItems = document.querySelectorAll('.comment');
+    // функционал удаления последнего комментария
+    let buttonDelete = document.querySelector('button[class="delete-form-button"]');
+    buttonDelete.addEventListener("click", () => {
+      let lis = document.querySelectorAll('.comment');  // создаем коллекцию/псевдомассив из элементов с классом '.comment'
+      let liDelete = lis[lis.length - 1];  // определяем элемент для удаления по индексу последнего в коллекции
+      liDelete.parentNode.removeChild(liDelete); // вызываем метод удаления потомка коллекции - элемента для удаления
+    });
+}
 
+    // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАРИЙ ЧЕРЕЗ ФОРМУ ВВОДА
 
-  initLikeComments();           // вызов функции добавления/удаления лайка(нажатие на сердечко)
-
-
-
-  initReplyComment();           // вызов функции ответа на комментарий с цитированием автора и текста
-
-
+function globalAdd() {
+    
+    renderForms();
+    const buttonElement = document.querySelector('button[class="add-form-button"]');
+    const nameElement = document.querySelector('input[class="add-form-name"]');
+    const textElement = document.querySelector('textarea[class="add-form-text"]');
+    const addFormElement = document.querySelector('div[class="add-form"]');
 
     // ПЕРЕКРАСКА КНОПКИ "НАПИСАТЬ" В ФОРМЕ ВВОДА КОММЕНТАРИЯ ПОСЛЕ НАЧАЛА ВВОДА В ПОЛЕ ИМЕНИ И ТЕКСТА
-
-    buttonElement.className = 'error-add-form-button'; // сбрасываю стиль кнопки "Написать" на серый, чтобы было понятно,
-    // что без заполнения полей Имя и Комментарий отправить форму нельзя
-
+    buttonElement.className = 'error-add-form-button'; // сбрасываю стиль кнопки "Написать" на серый, чтобы было понятно, что без заполнения полей Имя и Комментарий отправить форму нельзя
     let nameElementCheck = false;          // для проверки событий пользователь начинает печать и в поле Имя,
     let textElementCheck = false;          // и в поле Комментарий ввожу булевые переменные
-
     function handleInputs() {              // объявление функции, которая перекрашивает кнопку "Написать" в зеленый цвет
       if (nameElementCheck && textElementCheck) {      // ввод и в Имя и в текст произошел
         buttonElement.className = 'add-form-button';   // перекрашиваем кнопку
       }
     }
-
     nameElement.addEventListener("input", () => {   // вызов функции перекраски "Написать" в зеленый цвет
       nameElementCheck = true;
       handleInputs();
-    });
-
+    })
     textElement.addEventListener("input", () => {   // вызов функции перекраски "Написать" в зеленый цвет
       textElementCheck = true;
       handleInputs();
-    });
+    })
 
-
-
-
-
-    // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАРИЙ ЧЕРЕЗ ФОРМУ ВВОДА
 
     let buttonCheck = false;  // для проверки событий нажата либо кнопка "Написать",
     let enterCheck = false;   // либо кнопка "Enter" ввожу переменные, со значением по умолчанию
-
     function handleAddButtons() {          // объявление функции добавления комментария
-
-        
-
-
       if (buttonCheck || enterCheck) {  // клик либо на кнопку "Написать", либо на "Enter" произошел
         if (nameElement.value === '' || textElement.value === '') { // если имя или текст незаполнены, но кнопка "Написать" или "Enter" нажата,
           buttonElement.className = 'error-add-form-button';        // то элемент не добавлять и кнопку "Написать" покрасить в серый цвет
           return;
         }
-
-
         addFormElement.style.display = 'none';
         addFormProgressElement.style.display = 'block'
-
-
         // FETCH POST - добавление коммента на страницу через отправку по API на сервер
         
         function postComment() {
@@ -219,7 +195,8 @@ const renderComments = () => {         // объявление функции р
               likes: 0,
               forceError: true,
             }),
-          }).then((response) => {
+          })
+          .then((response) => {
             if (response.status === 500) {
               throw new Error("Сервер сломался");
             }
@@ -227,20 +204,23 @@ const renderComments = () => {         // объявление функции р
               throw new Error("Плохой запрос");
             }
             return response.json();
-          }).then((responseData) => {
+          })
+          .then((responseData) => {
             comments = responseData.comments;
-          }).then(() => {
+          })
+          .then(() => {
             return fetchAndRenderComments();                          // FETCH GET - получение комментов с сервера и их рендеринг
-          }).then((data) => {
+          })
+          .then((data) => {
             addFormProgressElement.style.display = 'none';
             addFormElement.style.display = 'flex';
-
             nameElement.value = '';           // возвращаем начальные значения полям формы ввода
             textElement.value = '';
             buttonElement.className = 'error-add-form-button';
             nameElementCheck = false;
             textElementCheck = false;
-          }).catch((error, typeError) => {
+          })
+          .catch((error, typeError) => {
             addFormProgressElement.style.display = 'none';
             addFormElement.style.display = 'flex';
             if (error.message === "Плохой запрос") {
@@ -248,6 +228,8 @@ const renderComments = () => {         // объявление функции р
               return;
             }
             if (error.message === "Сервер сломался") {
+              addFormElement.style.display = 'none';
+              addFormProgressElement.style.display = 'block'
               postComment();
             }
             else {
@@ -273,15 +255,11 @@ const renderComments = () => {         // объявление функции р
         enterCheck = true;
         handleAddButtons();
       }
-    });
+    })
 
-      // функционал удаления последнего комментария
-    let buttonDelete = document.querySelector('button[class="delete-form-button"]');
-    buttonDelete.addEventListener("click", () => {
-      let lis = document.querySelectorAll('.comment');  // создаем коллекцию/псевдомассив из элементов с классом '.comment'
-      let liDelete = lis[lis.length - 1];  // определяем элемент для удаления по индексу последнего в коллекции
-      liDelete.parentNode.removeChild(liDelete); // вызываем метод удаления потомка коллекции - элемента для удаления
-    });
+}
+
+globalAdd();
 
 
-};
+
