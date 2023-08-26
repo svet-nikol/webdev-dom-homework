@@ -1,5 +1,5 @@
+import { getComments, postApi } from "./modules/api.js";
 
-const indexContainerElement = document.querySelector('div[class="container"]');
 const ulElement = document.querySelector('ul[class="comments"]');
 const ulProgressElement = document.querySelector('div[class="comments-progress"]');
 const addFormProgressElement = document.querySelector('div[class="add-form-progress"]');
@@ -10,22 +10,14 @@ const containerFormsElement = document.querySelector('div[class="containerForms"
 let comments = [];       // объекты получаем с сервера по API в функции fetchAndRenderComments 
 
 function fetchAndRenderComments() {
-    return fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
-    {
-      method: "GET",
-    }).then((response) => {
-      return response.json();
-    }).then((responseData) => {
+  ulElement.style.display = 'none';
+  ulProgressElement.style.display = 'block';
+  getComments().then((responseData) => {
       comments = responseData.comments;
       renderComments();
-    });
-}
-
-function initGetComments() {          // подождите, комментарии загружаются при первой загрузке страницы
-    ulElement.style.display = 'none';
-    ulProgressElement.style.display = 'block';
-    fetchAndRenderComments()
-    .then((data) => {
+      return true;
+    })
+    .then(() => {
       ulElement.style.display = 'flex';
       ulProgressElement.style.display = 'none';
     })
@@ -37,7 +29,8 @@ function initGetComments() {          // подождите, комментар�
     }); 
 }
 
-initGetComments();
+fetchAndRenderComments();
+
 
 // РЕНДЕРИНГ СТРАНИЦЫ
 
@@ -106,10 +99,10 @@ function initReplyComment() {         // объявление функции о�
  
         for (let liItem of listLiItems) {
             liItem.addEventListener("click", () => {
-                let indexLiItem = liItem.dataset.index;
-                let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].author.name}:\n${comments[indexLiItem].text} QUOTE_END \n`;
-                textElement.value = replyComment;
-                renderComments();
+            let indexLiItem = liItem.dataset.index;
+            let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].author.name}:\n${comments[indexLiItem].text} QUOTE_END \n`;
+            textElement.value = replyComment;
+            renderComments();
             })
         }
 }
@@ -172,44 +165,20 @@ function globalAdd() {
           buttonElement.className = 'error-add-form-button';        // то элемент не добавлять и кнопку "Написать" покрасить в серый цвет
           return;
         }
-        addFormElement.style.display = 'none';
-        addFormProgressElement.style.display = 'block'
-        // FETCH POST - добавление коммента на страницу через отправку по API на сервер
+      addFormElement.style.display = 'none';
+      addFormProgressElement.style.display = 'block'
+      // FETCH POST - добавление коммента на страницу через отправку по API на сервер
         
-        function postComment() {
-          fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST - отправляем коммент на сервер
-          {
-            method: "POST",
-            body: JSON.stringify({
-              name: nameElement.value
-                    .replaceAll("&", "&amp;")
-                    .replaceAll("<", "&lt;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll('"', "&quot;"),
-              text: textElement.value
-                    .replaceAll("&", "&amp;")
-                    .replaceAll("<", "&lt;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll('"', "&quot;"),
-              isLiked:	false,
-              likes: 0,
-              forceError: true,
-            }),
-          })
-          .then((response) => {
-            if (response.status === 500) {
-              throw new Error("Сервер сломался");
-            }
-            if (response.status === 400) {
-              throw new Error("Плохой запрос");
-            }
-            return response.json();
+          function postComment() {
+          postApi ({
+              name: nameElement.value,
+              text: textElement.value,
           })
           .then((responseData) => {
             comments = responseData.comments;
           })
           .then(() => {
-            return fetchAndRenderComments();                          // FETCH GET - получение комментов с сервера и их рендеринг
+            return fetchAndRenderComments();  // FETCH GET - получение комментов с сервера и их рендеринг
           })
           .then((data) => {
             addFormProgressElement.style.display = 'none';
@@ -229,7 +198,7 @@ function globalAdd() {
             }
             if (error.message === "Сервер сломался") {
               addFormElement.style.display = 'none';
-              addFormProgressElement.style.display = 'block'
+              addFormProgressElement.style.display = 'block';
               postComment();
             }
             else {
@@ -237,29 +206,24 @@ function globalAdd() {
             }
             console.warn(error);
           });
-        }
-
+          }
       postComment();
-
-      };
-    };
-
-    buttonElement.addEventListener("click", () => {   // вызов функции добавления комментария по клику на кнопку "Написать"
-      buttonCheck = true;
-      handleAddButtons();
-
-    });
-
-    document.addEventListener("keyup", (event) => {   // вызов функции добавления комментария по клику на кнопку "Enter"
-      if (event.key === 'Enter') {
-        enterCheck = true;
-        handleAddButtons();
       }
-    })
+    }
+
+  buttonElement.addEventListener("click", () => {   // вызов функции добавления комментария по клику на кнопку "Написать"
+    buttonCheck = true;
+    handleAddButtons();
+
+  });
+
+  document.addEventListener("keyup", (event) => {   // вызов функции добавления комментария по клику на кнопку "Enter"
+    if (event.key === 'Enter') {
+      enterCheck = true;
+      handleAddButtons();
+    }
+  })
 
 }
 
-globalAdd();
-
-
-
+globalAdd()
