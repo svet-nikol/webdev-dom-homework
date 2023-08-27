@@ -9,6 +9,7 @@ export { fetchAndRenderComments };
 let comments = [];        
 
 function fetchAndRenderComments() {   // ЗАГРУЗКА С СЕРВЕРА И РЕНДЕР ВСЕХ КОММЕНТАРИЕВ
+  
   ulElement.style.display = 'none';
   ulProgressElement.style.display = 'block';
   getComments().then((responseData) => {
