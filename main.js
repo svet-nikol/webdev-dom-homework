@@ -28,8 +28,8 @@ function fetchAndRenderComments() {   // ЗАГРУЗКА С СЕРВЕРА И �
     .catch((error) => {
       // const ulElement = document.querySelector('ul[class="comments"]');
       // const ulProgressElement = document.querySelector('div[class="comments-progress"]');
-      ulElement.style.display = 'flex';
-      ulProgressElement.style.display = 'none';
+      // ulElement.style.display = 'flex';
+      // ulProgressElement.style.display = 'none';
       alert("Кажется, у вас сломался интернет, попробуйте позже обновить страницу...");
       console.warn(error);
     }); 

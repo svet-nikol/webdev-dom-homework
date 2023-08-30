@@ -5,7 +5,13 @@ export { renderComments, renderForms };
 
 
     function renderComments({ comments }) {  
-        const appElement = document.querySelector('div[class="containerComments"]');     
+        const appElement = document.querySelector('div[class="containerComments"]');
+        let appHTML = `
+        <div class="comments-progress">
+          <p>Подождите, комментарии загружаются...</p>   <!-- для лоудера на момент загрузки всех комментариев с свервера -->
+        </div>`;
+        appElement.innerHTML = appHTML;
+
         const commentsHTML = comments
           .map((comment, ind) => {
           let currentTime = new Date(comment.date);
@@ -30,10 +36,10 @@ export { renderComments, renderForms };
               </li> `;
         }).join("");
 
-        const appHTML = `      <ul class="comments">${commentsHTML}</ul>
+        appHTML = `<ul class="comments">${commentsHTML}</ul>
         <div class="comments-progress">
           <p>Подождите, комментарии загружаются...</p>   <!-- для лоудера на момент загрузки всех комментариев с свервера -->
-        </div>`
+        </div>`;
     
         appElement.innerHTML = appHTML;
 
