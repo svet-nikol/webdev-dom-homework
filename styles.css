@@ -1,4 +1,4 @@
-body {
+body {add-form-progress
   margin: 0;
 }
 
@@ -37,7 +37,7 @@ body {
 }
 
 .comments {
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 24px;
 }
@@ -100,11 +100,17 @@ body {
   display: flex;
   flex-direction: column;
 }
-.add-form-progress,      /* 2.13 добавила для лоудера на момент загрузки всех комментариев */
-.comments-progress {     /* 2.13 добавила для лоудера на форме добавления нового коммента */
+.add-form-progress {     
   padding: 20px;
   margin-top: 48px;
   display: none;
+  text-align: center;
+}
+
+.comments-progress {
+  padding: 20px;
+  margin-top: 48px;
+  display: block;
   text-align: center;
 }
 
