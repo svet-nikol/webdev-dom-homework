@@ -1,5 +1,8 @@
+const baseUrl = 'https://wedev-api.sky.pro/api/v2/:sveta-plaksina'
+
+
 export function getComments() {
-    return fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",      // FETCH GET - получение комментов с сервера
+    return fetch(`${baseUrl}/comments`,      // FETCH GET - получение комментов с сервера
     {
       method: "GET",
     })
@@ -9,7 +12,7 @@ export function getComments() {
 }
 
 export function postApi({ name, text }) {
-    return fetch("https://wedev-api.sky.pro/api/v1/:sveta-plaksina/comments",    // FETCH POST - отправляем коммент на сервер
+    return fetch(`${baseUrl}/comments`,    // FETCH POST - отправляем коммент на сервер
     {
       method: "POST",
       body: JSON.stringify({

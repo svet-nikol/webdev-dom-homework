@@ -12,7 +12,7 @@ export { renderComments, renderForms };
           return `
               <li data-index="${ind}" class="comment">
                   <div class="comment-header">
-                      <div>${comment.author.name}</div>
+                      <div>${comment.author.name} (${comment.author.login})</div>
                       <div>${commentTime}</div>
                   </div>
                   <div class="comment-body">
