@@ -1,5 +1,6 @@
 import { renderComments } from "./render.js";
 import { postApi } from "./api.js";
+import { appElement } from "./vars.js";
 export { initLikeComments, initReplyComment, checkInput, addComment };
 
 
@@ -125,4 +126,11 @@ function addComment ({ buttonElement, addFormElement, addFormProgressElement, na
         handleAddButtons();
       }
     })
+}
+
+export function initLoaderComments() {
+  appElement.innerHTML = `
+  <div class="comments-progress">
+    <p>Подождите, комментарии загружаются...</p>
+  </div>`;
 }
