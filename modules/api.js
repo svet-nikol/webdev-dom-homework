@@ -1,5 +1,9 @@
 const baseUrl = 'https://wedev-api.sky.pro/api/v2/:sveta-plaksina';
 const userUrl = 'https://wedev-api.sky.pro/api/user';
+export let token;
+export const setToken = (newToken) => {
+  token = newToken
+};
 
 
 export function getComments() {
@@ -13,7 +17,7 @@ export function getComments() {
 }
 
 export function postApi({ name, text }) {
-    return fetch(`${baseUrl}/comments`,    // FETCH POST - отправляем коммент на сервер
+    return fetch(`${baseUrl}/comments`,    //  FETCH POST - отправляем коммент на сервер   
     {
       method: "POST",
       body: JSON.stringify({
@@ -29,8 +33,11 @@ export function postApi({ name, text }) {
               .replaceAll('"', "&quot;"),
         isLiked:	false,
         likes: 0,
-        forceError: true,
+        // forceError: true,
       }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
     .then((response) => {
       if (response.status === 500) {

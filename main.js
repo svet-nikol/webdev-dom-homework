@@ -1,7 +1,8 @@
 import { getComments } from "./modules/api.js";
 import { renderComments, renderForms } from "./modules/render.js";
 import { checkInput, addComment, initLoaderComments } from "./modules/actions.js";
-export { fetchAndRenderComments };
+import { initRenderLoginForm } from "./modules/renderLogin.js";
+export { fetchAndRenderComments, globalAdd };
 
 
 
@@ -22,7 +23,7 @@ function fetchAndRenderComments() {   // ЗАГРУЗКА С СЕРВЕРА И �
 
 fetchAndRenderComments();
 
-
+initRenderLoginForm();
 
 function globalAdd() {   // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАРИЙ ЧЕРЕЗ ФОРМУ ВВОДА
     
@@ -40,4 +41,4 @@ function globalAdd() {   // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАР
 
 }
 
-globalAdd();
+// globalAdd();
