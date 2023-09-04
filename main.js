@@ -27,7 +27,7 @@ initRenderLoginForm();
 
 function globalAdd() {   // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАРИЙ ЧЕРЕЗ ФОРМУ ВВОДА, вызов функции в initRenderLoginForm после авторизаци или регистрации
     
-    renderForms({ comments });
+    renderForms();
 
     const buttonElement = document.querySelector('button[class="add-form-button"]');
     const nameElement = document.querySelector('input[class="add-form-name"]');

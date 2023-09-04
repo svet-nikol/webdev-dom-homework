@@ -46,7 +46,7 @@ export { renderComments, renderForms };
     function renderForms() {         
         containerFormsElement.innerHTML = `
         <div class="add-form">
-          <input type="text" class="add-form-name">
+          <input type="text" class="add-form-name"> 
           <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
           <div class="add-form-row">
             <button class="add-form-button">Написать</button>

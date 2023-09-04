@@ -11,7 +11,7 @@ export const initRenderLoginForm = () => {
     const enterFormHTML = `<div class="enter-form" id="enter-form">
     <p class="enter-form-header"><b>Форма входа</b></p>
     <input type="text" class="enter-form-name" id="enter-form-login" placeholder="Введите логин" />
-    <input type="text" class="enter-form-name" id="enter-form-password" placeholder="Введите пароль" />
+    <input type="password" class="enter-form-name" id="enter-form-password" placeholder="Введите пароль" />
     <div class="enter-form-row">
     <button class="enter-form-button" id="enter-form-button">Войти</button>
     <p class="enter-form-link" id="enter-form-link">Зарегистрироваться</p>
