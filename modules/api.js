@@ -83,3 +83,18 @@ export function registration({login, name, password}) {
     return response.json();
   });
 }
+
+export function deleteCommentApi({ id }) {
+  return fetch(`${baseUrl}/comments/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },    
+  })
+  .then((response) => {
+    if (response.status === 401) {
+      throw new Error("Нет авторизации");
+    }
+    return response.json();
+  });
+}
