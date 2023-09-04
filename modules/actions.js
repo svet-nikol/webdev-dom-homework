@@ -1,7 +1,8 @@
 import { renderComments } from "./render.js";
-import { postApi } from "./api.js";
+import { postApi, deleteCommentApi } from "./api.js";
 import { appElement } from "./vars.js";
-export { initLikeComments, initReplyComment, checkInput, addComment };
+export { initLikeComments, initReplyComment, checkInput, addComment, deleteComment };
+import { fetchAndRenderComments } from "../main.js";
 
 
 function initLikeComments ({ comments }) {       
@@ -34,8 +35,13 @@ function initReplyComment ({ comments }) {
  
         for (let liItem of listLiItems) {
             liItem.addEventListener("click", () => {
-            let indexLiItem = liItem.dataset.index;
-            let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].author.name}:\n${comments[indexLiItem].text} QUOTE_END \n`;
+            let idComment = liItem.dataset.index;
+
+            let indexComment = comments.findIndex(function(comment) {
+              return comment.id === idComment;
+            });
+                     
+            let replyComment = `QUOTE_BEGIN ${comments[indexComment].author.name}(${comments[indexComment].author.login}):\n${comments[indexComment].text}QUOTE_END \n`;
             textElement.value = replyComment;
             renderComments({ comments });
             })
@@ -126,6 +132,34 @@ function addComment ({ buttonElement, addFormElement, addFormProgressElement, na
         handleAddButtons();
       }
     })
+}
+
+function deleteComment({ comments }) {
+  let indexDeleteComment = comments.length - 1;
+  let id = comments[indexDeleteComment].id;
+  let buttonDelete = document.querySelector('button[class="delete-form-button"]');
+  buttonDelete.addEventListener("click", () => {
+    console.log(id);
+    buttonDelete.disabled = true;
+    buttonDelete.textContent = "Комментарий удаляется...";
+    deleteCommentApi({ id })
+    .then(() => {
+      fetchAndRenderComments();
+    })
+    .catch((error) => {
+      if (error.message === "Нет авторизации") {
+        alert("Сначала авторизуйтесь!");
+        buttonDelete.disabled = false;
+        buttonDelete.textContent = "Удалить последний комментарий";
+        return;    
+    } else {
+        alert("Кажется, у вас сломался интернет, попробуйте позже");
+        buttonDelete.disabled = false;
+        buttonDelete.textContent = "Удалить последний комментарий";
+    }
+    console.warn(error);
+    });    
+  })
 }
 
 export function initLoaderComments() {

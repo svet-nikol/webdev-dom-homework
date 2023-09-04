@@ -1,7 +1,6 @@
 import { appElement, containerFormsElement  } from "./vars.js";
-import { initLikeComments, initReplyComment } from "./actions.js";
-import { deleteCommentApi } from "./api.js";
-import { fetchAndRenderComments } from "../main.js";
+import { initLikeComments, initReplyComment, deleteComment } from "./actions.js";
+
 
 
 export { renderComments, renderForms };
@@ -33,44 +32,14 @@ export { renderComments, renderForms };
         }).join("");
 
     
-        appElement.innerHTML = `<ul class="comments">${commentsHTML}</ul>
-        <div class="delete-form">
-        <button class="delete-form-button">Удалить последний комментарий</button>
-        </div>`;
+      appElement.innerHTML = `<ul class="comments">${commentsHTML}</ul>
+      <div class="delete-form">
+      <button class="delete-form-button">Удалить последний комментарий</button>
+      </div>`;
 
-    
-        initLikeComments({ comments }); 
-        initReplyComment({ comments });
-
-        function deleteComment() {
-          let indexDeleteComment = comments.length - 1;
-          let id = comments[indexDeleteComment].id;
-          let buttonDelete = document.querySelector('button[class="delete-form-button"]');
-          buttonDelete.addEventListener("click", () => {
-            console.log(id);
-            buttonDelete.disabled = true;
-            buttonDelete.textContent = "Комментарий удаляется...";
-            deleteCommentApi({ id })
-            .then(() => {
-              fetchAndRenderComments();
-            })
-            .catch((error) => {
-              if (error.message === "Нет авторизации") {
-                alert("Сначала авторизуйтесь!");
-                buttonDelete.disabled = false;
-                buttonDelete.textContent = "Удалить последний комментарий";
-                return;    
-            } else {
-                alert("Кажется, у вас сломался интернет, попробуйте позже");
-                buttonDelete.disabled = false;
-                buttonDelete.textContent = "Удалить последний комментарий";
-            }
-            console.warn(error);
-            });    
-          })
-        }
-
-        deleteComment();
+      initLikeComments({ comments }); 
+      initReplyComment({ comments });
+      deleteComment({ comments });
     
     }
 
@@ -89,16 +58,6 @@ export { renderComments, renderForms };
 
 
         // value="Имя и пользователя получить с сервера" readonly
-
-
-    
-        // функционал удаления последнего комментария без API
-        // let buttonDelete = document.querySelector('button[class="delete-form-button"]');
-        // buttonDelete.addEventListener("click", () => {
-          // let lis = document.querySelectorAll('.comment');  
-          // let liDelete = lis[lis.length - 1];
-          // liDelete.parentNode.removeChild(liDelete); 
-        // });
 
   
   }
