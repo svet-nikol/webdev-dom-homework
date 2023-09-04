@@ -25,7 +25,7 @@ fetchAndRenderComments();
 
 initRenderLoginForm();
 
-function globalAdd() {   // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАРИЙ ЧЕРЕЗ ФОРМУ ВВОДА
+function globalAdd() {   // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАРИЙ ЧЕРЕЗ ФОРМУ ВВОДА, вызов функции в initRenderLoginForm после авторизаци или регистрации
     
     renderForms();
 

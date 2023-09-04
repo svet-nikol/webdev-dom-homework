@@ -1,6 +1,7 @@
 import { appElement, containerFormsElement  } from "./vars.js";
 import { initLikeComments, initReplyComment } from "./actions.js";
 
+
 export { renderComments, renderForms };
 
 
@@ -43,7 +44,7 @@ export { renderComments, renderForms };
         <button class="delete-form-button">Удалить последний комментарий</button>
         </div>
         <div class="add-form">
-          <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
+          <input type="text" class="add-form-name" value="Имя и пользователя получить с сервера" readonly>
           <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
           <div class="add-form-row">
             <button class="add-form-button">Написать</button>

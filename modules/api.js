@@ -1,5 +1,6 @@
 const baseUrl = 'https://wedev-api.sky.pro/api/v2/:sveta-plaksina';
 const userUrl = 'https://wedev-api.sky.pro/api/user';
+
 export let token;
 export const setToken = (newToken) => {
   token = newToken
@@ -57,7 +58,25 @@ export function login({login, password}) {
       login,
       password,
     }),
-  }).then((response) => {
+  })
+  .then((response) => {
+    if (response.status === 400) {
+      throw new Error("Плохой запрос");
+    };
+    return response.json();
+  });
+}
+
+export function registration({login, name, password}) {
+  return fetch(userUrl, {
+    method: "POST",
+    body: JSON.stringify({
+      login,
+      name,
+      password,
+    }),
+  })
+  .then((response) => {
     if (response.status === 400) {
       throw new Error("Плохой запрос");
     };
