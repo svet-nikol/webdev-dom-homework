@@ -40,8 +40,6 @@ function initLikeComments ({ comments }) {
     }
 }
 
-
-
 function initReplyComment ({ comments }) {         
 
    const listLiItems = document.querySelectorAll('.comment');
