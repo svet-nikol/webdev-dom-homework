@@ -1,5 +1,5 @@
 import { renderComments } from "./render.js";
-import { postApi, deleteCommentApi } from "./api.js";
+import { postApi, deleteCommentApi, switchLike } from "./api.js";
 import { appElement } from "./vars.js";
 export { initLikeComments, initReplyComment, checkInput, addComment, deleteComment };
 import { fetchAndRenderComments } from "../main.js";
@@ -8,24 +8,38 @@ import { fetchAndRenderComments } from "../main.js";
 function initLikeComments ({ comments }) {       
     
     const listLikeButtons = document.querySelectorAll('.like-button');
-  
+
     for (let like of listLikeButtons) {
       like.addEventListener("click", (event) => {
         event.stopPropagation();
-        let indexLike = like.dataset.index;
-        if (comments[indexLike].isLiked) {
-          comments[indexLike].likes -= 1;
-          comments[indexLike].isLiked = false;
+        let id = like.dataset.index;
+
+        like.disabled = true;
+
+        switchLike({ id })
+        .then((data) => {
+          let indexLike = comments.findIndex(function(comment) {
+            return comment.id === id;
+          });
+          comments[indexLike].likes = data.result.likes;
+          comments[indexLike].isLiked = data.result.isLiked;
+          renderComments({ comments });
+        })
+        .catch((error) => {
+          if (error.message === "Нет авторизации") {
+            alert("Сначала авторизуйтесь!");
+            like.disabled = false;
+            return;    
         } else {
-          comments[indexLike].likes += 1;
-          comments[indexLike].isLiked = true;
+            alert("Кажется, у вас сломался интернет, попробуйте позже");
+            like.disabled = false;
         }
-  
-        renderComments({ comments });
-  
+        console.warn(error);
+        });    
       })
     }
 }
+
 
 
 function initReplyComment ({ comments }) {         
@@ -133,7 +147,6 @@ function deleteComment({ comments }) {
   let id = comments[indexDeleteComment].id;
   let buttonDelete = document.querySelector('button[class="delete-form-button"]');
   buttonDelete.addEventListener("click", () => {
-    console.log(id);
     buttonDelete.disabled = true;
     buttonDelete.textContent = "Комментарий удаляется...";
     deleteCommentApi({ id })

@@ -28,7 +28,7 @@ export { renderComments, renderForms };
                   <div class="comment-footer">
                       <div class="likes">
                       <span class="likes-counter">${comment.likes}</span>
-                      <button data-index="${ind}" class="like-button ${comment.isLiked ? "-active-like" : ""}"></button>
+                      <button data-index="${comment.id}" class="like-button ${comment.isLiked ? "-active-like" : ""}"></button>
                       </div>
                   </div>
               </li> `;

@@ -17,7 +17,7 @@ export function getComments() {
     })
 }
 
-export function postApi({ name, text }) {
+export function postApi({ text }) {
     return fetch(`${baseUrl}/comments`,    //  FETCH POST - отправляем коммент на сервер   
     {
       method: "POST",
@@ -89,6 +89,22 @@ export function deleteCommentApi({ id }) {
     if (response.status === 401) {
       throw new Error("Нет авторизации");
     }
+    return response.json();
+  });
+}
+
+export function switchLike({ id }) {
+  return fetch(`${baseUrl}/comments/${id}/toggle-like`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },    
+  })
+  .then((response) => {
+    console.log(response);
+    if (response.status === 401) {
+      throw new Error("Нет авторизации");
+    }    
     return response.json();
   });
 }
