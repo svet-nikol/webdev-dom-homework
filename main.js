@@ -35,10 +35,8 @@ function globalAdd() {   // ДОБАВЛЕНИЕ НОВОГО КОММЕНТАР
     const addFormElement = document.querySelector('div[class="add-form"]');
     const addFormProgressElement = document.querySelector('div[class="add-form-progress"]');
 
-    checkInput({ buttonElement, nameElement, textElement });
+    checkInput({ buttonElement, textElement });
 
     addComment ({ buttonElement, addFormElement, addFormProgressElement, nameElement, textElement, comments, fetchAndRenderComments });
 
 }
-
-// globalAdd();

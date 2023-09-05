@@ -48,32 +48,28 @@ function initReplyComment ({ comments }) {
         }
 }
 
-function checkInput ({ buttonElement, nameElement, textElement }) {
+function checkInput ({ buttonElement, textElement }) {
 
     buttonElement.className = 'error-add-form-button'; 
-    let nameElementCheck = false;                  
-    let textElementCheck = false;         
+    let textElementCheck = false;
     function handleInputs() {             
-      if (nameElementCheck && textElementCheck) {     
+      if (textElementCheck) {     
         buttonElement.className = 'add-form-button';   
       }
     }
-    nameElement.addEventListener("input", () => {   
-      nameElementCheck = true;
-      handleInputs();
-    })
     textElement.addEventListener("input", () => {   
       textElementCheck = true;
       handleInputs();
     })
+
 }
 
-function addComment ({ buttonElement, addFormElement, addFormProgressElement, nameElement, textElement, comments, fetchAndRenderComments }) {
+function addComment ({ buttonElement, addFormElement, addFormProgressElement, textElement, comments, fetchAndRenderComments }) {
     let buttonCheck = false;  
     let enterCheck = false;   
     function handleAddButtons() {          
       if (buttonCheck || enterCheck) {  
-        if (nameElement.value === '' || textElement.value === '') { 
+        if (textElement.value === '') { 
           buttonElement.className = 'error-add-form-button';        
           return;
         }
@@ -82,7 +78,6 @@ function addComment ({ buttonElement, addFormElement, addFormProgressElement, na
         
           function postComment() {
           postApi ({
-              name: nameElement.value,
               text: textElement.value,
           })
           .then((responseData) => {
@@ -93,16 +88,15 @@ function addComment ({ buttonElement, addFormElement, addFormProgressElement, na
           })
           .then((data) => {
             addFormProgressElement.style.display = 'none';
-            addFormElement.style.display = 'flex';
-            nameElement.value = '';           
+            addFormElement.style.display = 'flex';      
             textElement.value = '';
-            checkInput ({ buttonElement, nameElement, textElement });
+            checkInput ({ buttonElement, textElement });
           })
           .catch((error, typeError) => {
             addFormProgressElement.style.display = 'none';
             addFormElement.style.display = 'flex';
             if (error.message === "Плохой запрос") {
-              alert("Имя и комментарий должны быть не короче 3 символов");
+              alert("Rомментарий должны быть не короче 3 символов");
               return;
             }
             if (error.message === "Сервер сломался") {

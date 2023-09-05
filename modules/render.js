@@ -1,7 +1,10 @@
 import { appElement, containerFormsElement  } from "./vars.js";
 import { initLikeComments, initReplyComment, deleteComment } from "./actions.js";
 
-
+export let loginUser;
+export const setLoginUser = (newLoginUser) => {
+  loginUser = newLoginUser
+};
 
 export { renderComments, renderForms };
 
@@ -46,7 +49,7 @@ export { renderComments, renderForms };
     function renderForms() {         
         containerFormsElement.innerHTML = `
         <div class="add-form">
-          <input type="text" class="add-form-name"> 
+          <input type="text" class="add-form-name" value="${loginUser}" readonly style="background: grey; color: #ffffff;"> 
           <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
           <div class="add-form-row">
             <button class="add-form-button">Написать</button>
@@ -55,9 +58,4 @@ export { renderComments, renderForms };
         <div class="add-form-progress">
         <p>Ваш комментарий добавляется...</p>
         </div>`;
-
-
-        // value="Имя и пользователя получить с сервера" readonly
-
-  
-  }
+    }

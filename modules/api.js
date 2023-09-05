@@ -22,11 +22,6 @@ export function postApi({ name, text }) {
     {
       method: "POST",
       body: JSON.stringify({
-        name: name
-              .replaceAll("&", "&amp;")
-              .replaceAll("<", "&lt;")
-              .replaceAll(">", "&gt;")
-              .replaceAll('"', "&quot;"),
         text: text
               .replaceAll("&", "&amp;")
               .replaceAll("<", "&lt;")
@@ -34,7 +29,6 @@ export function postApi({ name, text }) {
               .replaceAll('"', "&quot;"),
         isLiked:	false,
         likes: 0,
-        // forceError: true,
       }),
       headers: {
         Authorization: `Bearer ${token}`,

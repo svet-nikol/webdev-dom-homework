@@ -1,6 +1,8 @@
 import { login, setToken, registration, token } from "./api.js";
 import { fetchAndRenderComments, globalAdd } from "../main.js";
 import { appElement } from "./vars.js";
+import { setLoginUser } from "./render.js";
+
 
 export const initRenderLoginForm = () => {
     const containerFormsElement = document.querySelector('div[class="containerForms"]');
@@ -47,7 +49,7 @@ export const initRenderLoginForm = () => {
             })
             .then((responseData) => {
                 setToken(responseData.user.token);
-                console.log(responseData);
+                setLoginUser(`${responseData.user.name} (${responseData.user.login})`)
             })
             .then(() => {
                 appElement.style.display = 'flex';
@@ -90,6 +92,7 @@ export const initRenderLoginForm = () => {
             })
             .then((responseData) => {
                 setToken(responseData.user.token);
+                setLoginUser(`${responseData.user.name} (${responseData.user.login})`)
             })
             .then(() => {
                 appElement.style.display = 'flex';
