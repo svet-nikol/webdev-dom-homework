@@ -1,30 +1,44 @@
 import { renderComments } from "./render.js";
-import { postApi } from "./api.js";
-export { initLikeComments, initReplyComment, checkInput, addComment };
+import { postApi, deleteCommentApi, switchLike } from "./api.js";
+import { appElement } from "./vars.js";
+export { initLikeComments, initReplyComment, checkInput, addComment, deleteComment };
+import { fetchAndRenderComments } from "../main.js";
 
 
 function initLikeComments ({ comments }) {       
     
     const listLikeButtons = document.querySelectorAll('.like-button');
-  
+
     for (let like of listLikeButtons) {
       like.addEventListener("click", (event) => {
         event.stopPropagation();
-        let indexLike = like.dataset.index;
-        if (comments[indexLike].isLiked) {
-          comments[indexLike].likes -= 1;
-          comments[indexLike].isLiked = false;
+        let id = like.dataset.index;
+
+        like.disabled = true;
+
+        switchLike({ id })
+        .then((data) => {
+          let indexLike = comments.findIndex(function(comment) {
+            return comment.id === id;
+          });
+          comments[indexLike].likes = data.result.likes;
+          comments[indexLike].isLiked = data.result.isLiked;
+          renderComments({ comments });
+        })
+        .catch((error) => {
+          if (error.message === "Нет авторизации") {
+            alert("Сначала авторизуйтесь!");
+            like.disabled = false;
+            return;    
         } else {
-          comments[indexLike].likes += 1;
-          comments[indexLike].isLiked = true;
+            alert("Кажется, у вас сломался интернет, попробуйте позже");
+            like.disabled = false;
         }
-  
-        renderComments({ comments });
-  
+        console.warn(error);
+        });    
       })
     }
 }
-
 
 function initReplyComment ({ comments }) {         
 
@@ -33,40 +47,41 @@ function initReplyComment ({ comments }) {
  
         for (let liItem of listLiItems) {
             liItem.addEventListener("click", () => {
-            let indexLiItem = liItem.dataset.index;
-            let replyComment = `QUOTE_BEGIN ${comments[indexLiItem].author.name}:\n${comments[indexLiItem].text} QUOTE_END \n`;
+            let idComment = liItem.dataset.index;
+
+            let indexComment = comments.findIndex(function(comment) {
+              return comment.id === idComment;
+            });
+                     
+            let replyComment = `QUOTE_BEGIN ${comments[indexComment].author.name}(${comments[indexComment].author.login}):\n${comments[indexComment].text}QUOTE_END \n`;
             textElement.value = replyComment;
             renderComments({ comments });
             })
         }
 }
 
-function checkInput ({ buttonElement, nameElement, textElement }) {
+function checkInput ({ buttonElement, textElement }) {
 
     buttonElement.className = 'error-add-form-button'; 
-    let nameElementCheck = false;                  
-    let textElementCheck = false;         
+    let textElementCheck = false;
     function handleInputs() {             
-      if (nameElementCheck && textElementCheck) {     
+      if (textElementCheck) {     
         buttonElement.className = 'add-form-button';   
       }
     }
-    nameElement.addEventListener("input", () => {   
-      nameElementCheck = true;
-      handleInputs();
-    })
     textElement.addEventListener("input", () => {   
       textElementCheck = true;
       handleInputs();
     })
+
 }
 
-function addComment ({ buttonElement, addFormElement, addFormProgressElement, nameElement, textElement, comments, fetchAndRenderComments }) {
+function addComment ({ buttonElement, addFormElement, addFormProgressElement, textElement, comments, fetchAndRenderComments }) {
     let buttonCheck = false;  
     let enterCheck = false;   
     function handleAddButtons() {          
       if (buttonCheck || enterCheck) {  
-        if (nameElement.value === '' || textElement.value === '') { 
+        if (textElement.value === '') { 
           buttonElement.className = 'error-add-form-button';        
           return;
         }
@@ -75,7 +90,6 @@ function addComment ({ buttonElement, addFormElement, addFormProgressElement, na
         
           function postComment() {
           postApi ({
-              name: nameElement.value,
               text: textElement.value,
           })
           .then((responseData) => {
@@ -86,16 +100,15 @@ function addComment ({ buttonElement, addFormElement, addFormProgressElement, na
           })
           .then((data) => {
             addFormProgressElement.style.display = 'none';
-            addFormElement.style.display = 'flex';
-            nameElement.value = '';           
+            addFormElement.style.display = 'flex';      
             textElement.value = '';
-            checkInput ({ buttonElement, nameElement, textElement });
+            checkInput ({ buttonElement, textElement });
           })
           .catch((error, typeError) => {
             addFormProgressElement.style.display = 'none';
             addFormElement.style.display = 'flex';
             if (error.message === "Плохой запрос") {
-              alert("Имя и комментарий должны быть не короче 3 символов");
+              alert("Rомментарий должны быть не короче 3 символов");
               return;
             }
             if (error.message === "Сервер сломался") {
@@ -125,4 +138,38 @@ function addComment ({ buttonElement, addFormElement, addFormProgressElement, na
         handleAddButtons();
       }
     })
+}
+
+function deleteComment({ comments }) {
+  let indexDeleteComment = comments.length - 1;
+  let id = comments[indexDeleteComment].id;
+  let buttonDelete = document.querySelector('button[class="delete-form-button"]');
+  buttonDelete.addEventListener("click", () => {
+    buttonDelete.disabled = true;
+    buttonDelete.textContent = "Комментарий удаляется...";
+    deleteCommentApi({ id })
+    .then(() => {
+      fetchAndRenderComments();
+    })
+    .catch((error) => {
+      if (error.message === "Нет авторизации") {
+        alert("Сначала авторизуйтесь!");
+        buttonDelete.disabled = false;
+        buttonDelete.textContent = "Удалить последний комментарий";
+        return;    
+    } else {
+        alert("Кажется, у вас сломался интернет, попробуйте позже");
+        buttonDelete.disabled = false;
+        buttonDelete.textContent = "Удалить последний комментарий";
+    }
+    console.warn(error);
+    });    
+  })
+}
+
+export function initLoaderComments() {
+  appElement.innerHTML = `
+  <div class="comments-progress">
+    <p>Подождите, комментарии загружаются...</p>
+  </div>`;
 }
