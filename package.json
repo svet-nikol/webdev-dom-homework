@@ -4,7 +4,8 @@
   "description": "https://glebkaf.github.io/webdev-dom-homework/",
   "main": "main.js",
   "scripts": {
-    "dev": "webpack --mode development --watch"
+    "dev": "webpack --mode development --watch",
+    "format": "prettier --write ./modules/"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +13,7 @@
     "date-fns": "^2.30.0"
   },
   "devDependencies": {
+    "prettier": "^3.0.3",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4"
   }
