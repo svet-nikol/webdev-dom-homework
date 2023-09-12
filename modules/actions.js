@@ -5,6 +5,7 @@ export { initLikeComments, initReplyComment, checkInput, addComment, deleteComme
 import { fetchAndRenderComments } from "../main.js";
 
 
+
 function initLikeComments ({ comments }) {       
     
     const listLikeButtons = document.querySelectorAll('.like-button');
